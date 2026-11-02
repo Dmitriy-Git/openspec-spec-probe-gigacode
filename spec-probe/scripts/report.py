@@ -47,71 +47,71 @@ def validate(value, schema, path='$'):
 def normalize(report):
     r = copy.deepcopy(report)
     validate(r, json.loads(SCHEMA.read_text()))
-    findings = r['findings']
-    if len({f['id'] for f in findings}) != len(findings):
+    if len({f['id'] for f in r['findings']}) != len(r['findings']):
         raise ValueError('duplicate finding id')
-    for f in findings:
-        cause, action = f['cause'], f['action']
-        actions = {'spec_gap':{'rework','decision'},'spec_conflict':{'rework','decision'},
-                   'implementation_defect':{'fix_implementation'},'allowed_variation':{'none'},
-                   'environment_difference':{'investigate'},'insufficient_evidence':{'investigate'}}
-        if action not in actions[cause]:
-            raise ValueError(f'{f["id"]}: action contradicts cause')
-        if f['patches'] and cause not in ('spec_gap','spec_conflict'):
-            raise ValueError(f'{f["id"]}: code defects/unknowns cannot patch specifications')
-        if f['observation'] == 'ac_gap':
-            kinds = {e['kind'] for e in f['evidence']}
-            if not {'requirement','artifact'} <= kinds:
-                raise ValueError(f'{f["id"]}: ac_gap needs AC and reviewed artifacts')
-            if cause not in ('spec_gap','insufficient_evidence'):
-                raise ValueError(f'{f["id"]}: ac_gap cause contradicts missing specification coverage')
-        mi = f['missing_input']
-        if mi and mi['source']=='generation' and not any(e['kind']=='manifest' for e in mi['evidence']):
-            raise ValueError(f'{f["id"]}: generation attribution needs input manifest evidence')
-        for p in f['patches']:
-            target = Path(p['target'])
-            if target.is_absolute() or '..' in target.parts or '\\' in p['target'] or p['target']=='.':
-                raise ValueError('unsafe patch path')
-            digest = p['preimage']
-            if p['operation']=='create':
-                if digest!='absent' or p['old_text']:
-                    raise ValueError('create requires absent preimage and empty old_text')
-            elif len(digest)!=64 or any(c not in '0123456789abcdef' for c in digest):
-                raise ValueError('preimage must be SHA-256')
-            if p['operation']=='replace' and not p['old_text']:
-                raise ValueError('replace requires old_text')
-            if p['operation']=='delete' and p['new_text']:
-                raise ValueError('delete requires empty new_text')
-    incomplete = r['isolation']!='verified' or any(x['blocking'] for x in r['limitations'])
-    for name, check in r['checks'].items():
-        if check['status']!='passed' and not (name=='behavior' and check['status']=='not_applicable'):
-            incomplete = True
-    uncertain = any(f['severity']!='low' and
-                    (f['confidence']=='low' or f['cause'] in ('insufficient_evidence','environment_difference'))
-                    for f in findings)
-    spec = [f for f in findings if f['cause'] in ('spec_gap','spec_conflict')]
-    rework = any(f['cause']=='spec_conflict' or f['observation']=='ac_gap' or
-                 (f['action']=='rework' and f['severity']!='low') for f in spec)
-    decisions = any(f['action']=='decision' and f['severity']!='low' for f in spec)
-    quality = 'needs_rework' if rework else 'needs_decisions' if decisions else 'no_material_findings'
-    r['verdict'] = 'inconclusive' if incomplete or uncertain else quality if quality!='no_material_findings' else 'spec_ready'
-    r['summary'] = {'quality':quality,'analysis_complete':not (incomplete or uncertain),
-                    'implementation_status':'defects_found' if any(f['cause']=='implementation_defect' for f in findings) else 'no_defects_observed',
-                    'total':len(findings),'by_cause':dict(Counter(f['cause'] for f in findings)),
-                    'by_observation':dict(Counter(f['observation'] for f in findings)),
-                    'by_severity':dict(Counter(f['severity'] for f in findings))}
+    ids = {f['id'] for f in r['findings']}
+    for check in r['checks'].values():
+        if set(check['finding_ids']) - ids:
+            raise ValueError('unknown finding reference')
+    # Integrity failures invalidate the comparison; partial coverage does not.
+    unusable = (any(r['checks'][k]['status'] != 'passed'
+                    for k in ('inputs', 'reverse', 'freshness'))
+                or r['checks']['comparison']['status'] == 'failed')
+    r['verdict'] = ('unable_to_review' if unusable else 'needs_attention'
+                    if r['findings'] or r['questions'] or r['tests']['status'] == 'failed'
+                    else 'no_material_findings')
     return r
 
+
+VERDICTS = {'unable_to_review': 'Не удалось выполнить ревью',
+            'needs_attention': 'Есть замечания',
+            'no_material_findings': 'Существенных замечаний не обнаружено'}
+CHECKS = {'inputs': 'Входные данные', 'reverse': 'Восстановление change',
+          'requirements': 'Требования', 'comparison': 'Сравнение', 'freshness': 'Актуальность входов'}
+STATUSES = {'passed': 'Выполнена', 'failed': 'Не выполнена', 'unknown': 'Частично проверено'}
+SEVERITIES = {'high': 'высокая', 'medium': 'средняя', 'low': 'низкая'}
+CAUSES = {'implementation_defect': 'дефект реализации', 'spec_gap': 'пробел change',
+          'spec_conflict': 'противоречие', 'intentional_change_candidate': 'требуется решение',
+          'insufficient_evidence': 'требуется проверка'}
+
+
+def cell(value):
+    return value.replace('|', '&#124;').replace('\n', '<br>')
+
+
 def markdown(r):
-    lines = [f'# Spec probe: {r["run_id"]}', '', f'Verdict: **{r["verdict"]}**', '',
-             f'Scope: {r["scope"]}', '', '## Итоги', '',
-             '```json', json.dumps(r['summary'],ensure_ascii=False,indent=2), '```', '',
-             '## Краткий список (до 20)', '']
-    ranked = sorted(r['findings'],key=lambda f: {'high':0,'medium':1,'low':2}[f['severity']])
-    lines += [f'- {f["id"]}: {f["severity"]}, {f["cause"]} — {f["rationale"]}' for f in ranked[:20]]
-    lines += ['', '## Полные данные', '', 'Все находки, проверки, ограничения и доказательства:', '',
-              '````json', json.dumps(r,ensure_ascii=False,indent=2), '````', '']
+    counts = Counter(f['severity'] for f in r['findings'])
+    lines = [f'# Ревью change: {r["change_name"]}', '', '## Итог', '',
+             f'**{VERDICTS[r["verdict"]]}**', '',
+             f'Находок: {len(r["findings"])} (высокая важность: {counts["high"]}, '
+             f'средняя: {counts["medium"]}, низкая: {counts["low"]}).', '',
+             '## Область проверки', '', r['scope'], '']
+    if r['limitations']:
+        lines += ['Границы рассмотренного объёма:', '', *['- ' + x for x in r['limitations']], '']
+    lines += ['## Список проверок', '',
+              '| Проверка | Что проверено | Результат | Связанные находки |',
+              '|---|---|---|---|']
+    for name, c in r['checks'].items():
+        lines += [f'| {CHECKS[name]} | {cell(c["reason"])} | {STATUSES[c["status"]]} | '
+                  f'{", ".join(c["finding_ids"]) or "—"} |']
+    test_status = {'passed': 'Пройдены', 'failed': 'Есть ошибки',
+                   'not_run': 'Не запускались', 'unknown': 'Результат неизвестен'}
+    lines += [f'| Тесты | {cell(r["tests"]["reason"])} | {test_status[r["tests"]["status"]]} | — |',
+              '', '## Находки', '']
+    for f in sorted(r['findings'], key=lambda x: {'high':0,'medium':1,'low':2}[x['severity']]):
+        lines += [f'### {f["id"]}. {f["summary"]}', '',
+                  f'Важность: {SEVERITIES[f["severity"]]}  ', f'Тип: {CAUSES[f["cause"]]}', '']
+        for heading, key in [('Проблема', 'problem'), ('Как описано в reverse-change', 'reverse_change'),
+                             ('Как реализовано в коде', 'code'), ('Как описано в исходном change', 'original_change'),
+                             ('Предложение по исправлению', 'recommendation')]:
+            lines += [f'#### {heading}', '', f[key], '']
+        lines += ['Доказательства:', '', *['- ' + e for e in f['evidence']], '']
+    if not r['findings']:
+        lines += ['В проверенном объёме находок нет.', '']
+    if r['questions']:
+        lines += ['## Вопросы для решения', '', *['- ' + q for q in r['questions']], '']
     return '\n'.join(lines)
+
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
@@ -119,10 +119,27 @@ def main():
     args = parser.parse_args()
     try:
         r = normalize(json.loads(args.report.read_text()))
+        run = args.report.resolve().parent.parent
+        if args.report.resolve().parent.name != '_meta':
+            raise ValueError('expected <run>/_meta/report.json')
+        import importlib.util
+        spec = importlib.util.spec_from_file_location('probe_runner', Path(__file__).with_name('runner.py'))
+        runner = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(runner)
+        inputs = json.loads((run / '_meta/inputs.json').read_text())
+        if r['run_id'] != inputs['run_id']:
+            raise ValueError('report run_id differs from inputs')
+        fresh = runner.freshness(run)
+        if fresh['status'] != 'fresh':
+            r['checks']['freshness'] = {'status': 'failed', 'reason': '; '.join(fresh['reasons']), 'finding_ids': []}
+        reverse_hashes = json.loads((run / '_meta/reverse-hashes.json').read_text())
+        if not reverse_hashes or runner.tree(run / 'reverse-change') != reverse_hashes:
+            r['checks']['reverse'] = {'status': 'failed', 'reason': 'Reverse отсутствует или изменён после фиксации', 'finding_ids': []}
+        r = normalize(r)
     except (ValueError, OSError) as error:
         parser.exit(2, f'Invalid report: {error}\n')
     args.report.write_text(json.dumps(r,ensure_ascii=False,indent=2)+'\n')
-    args.report.with_suffix('.md').write_text(markdown(r))
+    (run / 'report.md').write_text(markdown(r))
     print(r['verdict'])
 
 if __name__=='__main__':

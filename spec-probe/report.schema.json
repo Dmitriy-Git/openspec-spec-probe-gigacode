@@ -2,7 +2,7 @@
   "type": "object",
   "properties": {
     "schema_version": {
-      "const": "2.0"
+      "const": "5.0"
     },
     "run_id": {
       "type": "string",
@@ -11,18 +11,6 @@
     "scope": {
       "type": "string",
       "minLength": 1
-    },
-    "manifest_ref": {
-      "type": "string",
-      "minLength": 1
-    },
-    "isolation": {
-      "type": "string",
-      "enum": [
-        "verified",
-        "degraded",
-        "unknown"
-      ]
     },
     "checks": {
       "type": "object",
@@ -35,22 +23,29 @@
               "enum": [
                 "passed",
                 "failed",
-                "unknown",
-                "not_applicable"
+                "unknown"
               ]
             },
             "reason": {
               "type": "string",
               "minLength": 1
+            },
+            "finding_ids": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
             }
           },
           "required": [
             "status",
-            "reason"
+            "reason",
+            "finding_ids"
           ],
           "additionalProperties": false
         },
-        "isolation": {
+        "reverse": {
           "type": "object",
           "properties": {
             "status": {
@@ -58,41 +53,25 @@
               "enum": [
                 "passed",
                 "failed",
-                "unknown",
-                "not_applicable"
+                "unknown"
               ]
             },
             "reason": {
               "type": "string",
               "minLength": 1
-            }
-          },
-          "required": [
-            "status",
-            "reason"
-          ],
-          "additionalProperties": false
-        },
-        "artifacts": {
-          "type": "object",
-          "properties": {
-            "status": {
-              "type": "string",
-              "enum": [
-                "passed",
-                "failed",
-                "unknown",
-                "not_applicable"
-              ]
             },
-            "reason": {
-              "type": "string",
-              "minLength": 1
+            "finding_ids": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
             }
           },
           "required": [
             "status",
-            "reason"
+            "reason",
+            "finding_ids"
           ],
           "additionalProperties": false
         },
@@ -104,22 +83,29 @@
               "enum": [
                 "passed",
                 "failed",
-                "unknown",
-                "not_applicable"
+                "unknown"
               ]
             },
             "reason": {
               "type": "string",
               "minLength": 1
+            },
+            "finding_ids": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
             }
           },
           "required": [
             "status",
-            "reason"
+            "reason",
+            "finding_ids"
           ],
           "additionalProperties": false
         },
-        "reverse_freshness": {
+        "comparison": {
           "type": "object",
           "properties": {
             "status": {
@@ -127,22 +113,29 @@
               "enum": [
                 "passed",
                 "failed",
-                "unknown",
-                "not_applicable"
+                "unknown"
               ]
             },
             "reason": {
               "type": "string",
               "minLength": 1
+            },
+            "finding_ids": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
             }
           },
           "required": [
             "status",
-            "reason"
+            "reason",
+            "finding_ids"
           ],
           "additionalProperties": false
         },
-        "behavior": {
+        "freshness": {
           "type": "object",
           "properties": {
             "status": {
@@ -150,171 +143,60 @@
               "enum": [
                 "passed",
                 "failed",
-                "unknown",
-                "not_applicable"
+                "unknown"
               ]
             },
             "reason": {
               "type": "string",
               "minLength": 1
-            }
-          },
-          "required": [
-            "status",
-            "reason"
-          ],
-          "additionalProperties": false
-        },
-        "risks": {
-          "type": "object",
-          "properties": {
-            "status": {
-              "type": "string",
-              "enum": [
-                "passed",
-                "failed",
-                "unknown",
-                "not_applicable"
-              ]
             },
-            "reason": {
-              "type": "string",
-              "minLength": 1
+            "finding_ids": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
             }
           },
           "required": [
             "status",
-            "reason"
-          ],
-          "additionalProperties": false
-        },
-        "baseline_validation": {
-          "type": "object",
-          "properties": {
-            "status": {
-              "type": "string",
-              "enum": [
-                "passed",
-                "failed",
-                "unknown",
-                "not_applicable"
-              ]
-            },
-            "reason": {
-              "type": "string",
-              "minLength": 1
-            }
-          },
-          "required": [
-            "status",
-            "reason"
+            "reason",
+            "finding_ids"
           ],
           "additionalProperties": false
         }
       },
       "required": [
         "inputs",
-        "isolation",
-        "artifacts",
+        "reverse",
         "requirements",
-        "reverse_freshness",
-        "behavior",
-        "risks",
-        "baseline_validation"
+        "comparison",
+        "freshness"
       ],
       "additionalProperties": false
     },
-    "limitations": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "reason": {
-            "type": "string",
-            "minLength": 1
-          },
-          "blocking": {
-            "type": "boolean"
-          }
+    "tests": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "passed",
+            "failed",
+            "not_run",
+            "unknown"
+          ]
         },
-        "required": [
-          "reason",
-          "blocking"
-        ],
-        "additionalProperties": false
-      }
-    },
-    "details": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "category": {
-            "type": "string",
-            "enum": [
-              "artifact",
-              "ac",
-              "risk",
-              "test",
-              "followup"
-            ]
-          },
-          "id": {
-            "type": "string",
-            "minLength": 1
-          },
-          "status": {
-            "type": "string",
-            "minLength": 1
-          },
-          "reason": {
-            "type": "string",
-            "minLength": 1
-          },
-          "evidence": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "kind": {
-                  "type": "string",
-                  "enum": [
-                    "code",
-                    "test",
-                    "requirement",
-                    "artifact",
-                    "search",
-                    "manifest"
-                  ]
-                },
-                "ref": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "scope": {
-                  "type": "string",
-                  "minLength": 1
-                }
-              },
-              "required": [
-                "kind",
-                "ref",
-                "scope"
-              ],
-              "additionalProperties": false
-            }
-          }
-        },
-        "required": [
-          "category",
-          "id",
-          "status",
-          "reason",
-          "evidence"
-        ],
-        "additionalProperties": false
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
       },
-      "minItems": 1
+      "required": [
+        "status",
+        "reason"
+      ],
+      "additionalProperties": false
     },
     "findings": {
       "type": "array",
@@ -325,30 +207,6 @@
             "type": "string",
             "minLength": 1
           },
-          "observation": {
-            "type": "string",
-            "enum": [
-              "divergent",
-              "implicit",
-              "deviates",
-              "unrealized",
-              "boundary_mismatch",
-              "rule_conflict",
-              "ac_gap",
-              "risk_gap"
-            ]
-          },
-          "cause": {
-            "type": "string",
-            "enum": [
-              "spec_gap",
-              "spec_conflict",
-              "implementation_defect",
-              "allowed_variation",
-              "environment_difference",
-              "insufficient_evidence"
-            ]
-          },
           "severity": {
             "type": "string",
             "enum": [
@@ -357,277 +215,101 @@
               "low"
             ]
           },
-          "confidence": {
+          "cause": {
             "type": "string",
             "enum": [
-              "high",
-              "medium",
-              "low"
+              "implementation_defect",
+              "spec_gap",
+              "spec_conflict",
+              "intentional_change_candidate",
+              "insufficient_evidence"
             ]
           },
-          "rationale": {
+          "summary": {
             "type": "string",
             "minLength": 1
-          },
-          "action": {
-            "type": "string",
-            "enum": [
-              "rework",
-              "decision",
-              "fix_implementation",
-              "none",
-              "investigate"
-            ]
           },
           "evidence": {
             "type": "array",
             "items": {
-              "type": "object",
-              "properties": {
-                "kind": {
-                  "type": "string",
-                  "enum": [
-                    "code",
-                    "test",
-                    "requirement",
-                    "artifact",
-                    "search",
-                    "manifest"
-                  ]
-                },
-                "ref": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "scope": {
-                  "type": "string",
-                  "minLength": 1
-                }
-              },
-              "required": [
-                "kind",
-                "ref",
-                "scope"
-              ],
-              "additionalProperties": false
+              "type": "string",
+              "minLength": 1
             },
             "minItems": 1
           },
-          "patches": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "alternative_id": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "target": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "operation": {
-                  "type": "string",
-                  "enum": [
-                    "create",
-                    "replace",
-                    "delete"
-                  ]
-                },
-                "preimage": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "old_text": {
-                  "type": "string"
-                },
-                "new_text": {
-                  "type": "string"
-                },
-                "application": {
-                  "type": "string",
-                  "enum": [
-                    "passed",
-                    "failed",
-                    "unknown",
-                    "not_run"
-                  ]
-                },
-                "structure": {
-                  "type": "string",
-                  "enum": [
-                    "passed",
-                    "failed",
-                    "unknown",
-                    "not_run"
-                  ]
-                },
-                "consistency": {
-                  "type": "string",
-                  "enum": [
-                    "passed",
-                    "failed",
-                    "unknown",
-                    "not_run"
-                  ]
-                },
-                "decision": {
-                  "type": "string",
-                  "enum": [
-                    "pending",
-                    "accepted",
-                    "rejected"
-                  ]
-                }
-              },
-              "required": [
-                "alternative_id",
-                "target",
-                "operation",
-                "preimage",
-                "old_text",
-                "new_text",
-                "application",
-                "structure",
-                "consistency",
-                "decision"
-              ],
-              "additionalProperties": false
-            }
+          "recommendation": {
+            "type": "string",
+            "minLength": 1
           },
-          "missing_input": {
-            "anyOf": [
-              {
-                "type": "null"
-              },
-              {
-                "type": "object",
-                "properties": {
-                  "source": {
-                    "type": "string",
-                    "enum": [
-                      "jira",
-                      "config_context",
-                      "config_rules",
-                      "project_specs",
-                      "gigacode_rules",
-                      "decision",
-                      "generation",
-                      "unknown"
-                    ]
-                  },
-                  "stage": {
-                    "type": "string",
-                    "enum": [
-                      "propose",
-                      "apply",
-                      "unknown"
-                    ]
-                  },
-                  "confidence": {
-                    "type": "string",
-                    "enum": [
-                      "high",
-                      "medium",
-                      "low"
-                    ]
-                  },
-                  "evidence": {
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "kind": {
-                          "type": "string",
-                          "enum": [
-                            "code",
-                            "test",
-                            "requirement",
-                            "artifact",
-                            "search",
-                            "manifest"
-                          ]
-                        },
-                        "ref": {
-                          "type": "string",
-                          "minLength": 1
-                        },
-                        "scope": {
-                          "type": "string",
-                          "minLength": 1
-                        }
-                      },
-                      "required": [
-                        "kind",
-                        "ref",
-                        "scope"
-                      ],
-                      "additionalProperties": false
-                    }
-                  },
-                  "hypothesis": {
-                    "type": "string",
-                    "minLength": 1
-                  },
-                  "suggested_text": {
-                    "type": "string",
-                    "minLength": 1
-                  }
-                },
-                "required": [
-                  "source",
-                  "stage",
-                  "confidence",
-                  "evidence",
-                  "hypothesis",
-                  "suggested_text"
-                ],
-                "additionalProperties": false
-              }
-            ]
+          "problem": {
+            "type": "string",
+            "minLength": 1
+          },
+          "reverse_change": {
+            "type": "string",
+            "minLength": 1
+          },
+          "code": {
+            "type": "string",
+            "minLength": 1
+          },
+          "original_change": {
+            "type": "string",
+            "minLength": 1
           }
         },
         "required": [
           "id",
-          "observation",
-          "cause",
           "severity",
-          "confidence",
-          "rationale",
-          "action",
+          "cause",
+          "summary",
           "evidence",
-          "patches",
-          "missing_input"
+          "recommendation",
+          "problem",
+          "reverse_change",
+          "code",
+          "original_change"
         ],
         "additionalProperties": false
       }
     },
-    "summary": {
-      "type": "object"
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
     },
     "verdict": {
       "type": "string",
       "enum": [
-        "inconclusive",
-        "needs_rework",
-        "needs_decisions",
-        "spec_ready"
+        "unable_to_review",
+        "needs_attention",
+        "no_material_findings"
       ]
+    },
+    "change_name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "questions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
     }
   },
   "required": [
     "schema_version",
     "run_id",
     "scope",
-    "manifest_ref",
-    "isolation",
     "checks",
+    "tests",
+    "findings",
     "limitations",
-    "details",
-    "findings"
+    "change_name",
+    "questions"
   ],
-  "additionalProperties": false,
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:openspec-spec-probe:report:2.0",
-  "title": "Spec probe report v2"
+  "additionalProperties": false
 }

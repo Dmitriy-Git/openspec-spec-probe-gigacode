@@ -1,0 +1,633 @@
+{
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "2.0"
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scope": {
+      "type": "string",
+      "minLength": 1
+    },
+    "manifest_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "isolation": {
+      "type": "string",
+      "enum": [
+        "verified",
+        "degraded",
+        "unknown"
+      ]
+    },
+    "checks": {
+      "type": "object",
+      "properties": {
+        "inputs": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": [
+                "passed",
+                "failed",
+                "unknown",
+                "not_applicable"
+              ]
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "status",
+            "reason"
+          ],
+          "additionalProperties": false
+        },
+        "isolation": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": [
+                "passed",
+                "failed",
+                "unknown",
+                "not_applicable"
+              ]
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "status",
+            "reason"
+          ],
+          "additionalProperties": false
+        },
+        "artifacts": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": [
+                "passed",
+                "failed",
+                "unknown",
+                "not_applicable"
+              ]
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "status",
+            "reason"
+          ],
+          "additionalProperties": false
+        },
+        "requirements": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": [
+                "passed",
+                "failed",
+                "unknown",
+                "not_applicable"
+              ]
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "status",
+            "reason"
+          ],
+          "additionalProperties": false
+        },
+        "reverse_freshness": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": [
+                "passed",
+                "failed",
+                "unknown",
+                "not_applicable"
+              ]
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "status",
+            "reason"
+          ],
+          "additionalProperties": false
+        },
+        "behavior": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": [
+                "passed",
+                "failed",
+                "unknown",
+                "not_applicable"
+              ]
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "status",
+            "reason"
+          ],
+          "additionalProperties": false
+        },
+        "risks": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": [
+                "passed",
+                "failed",
+                "unknown",
+                "not_applicable"
+              ]
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "status",
+            "reason"
+          ],
+          "additionalProperties": false
+        },
+        "baseline_validation": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": [
+                "passed",
+                "failed",
+                "unknown",
+                "not_applicable"
+              ]
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "status",
+            "reason"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "inputs",
+        "isolation",
+        "artifacts",
+        "requirements",
+        "reverse_freshness",
+        "behavior",
+        "risks",
+        "baseline_validation"
+      ],
+      "additionalProperties": false
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          },
+          "blocking": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "reason",
+          "blocking"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "details": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "category": {
+            "type": "string",
+            "enum": [
+              "artifact",
+              "ac",
+              "risk",
+              "test",
+              "followup"
+            ]
+          },
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "code",
+                    "test",
+                    "requirement",
+                    "artifact",
+                    "search",
+                    "manifest"
+                  ]
+                },
+                "ref": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "scope": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "kind",
+                "ref",
+                "scope"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "category",
+          "id",
+          "status",
+          "reason",
+          "evidence"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "observation": {
+            "type": "string",
+            "enum": [
+              "divergent",
+              "implicit",
+              "deviates",
+              "unrealized",
+              "boundary_mismatch",
+              "rule_conflict",
+              "ac_gap",
+              "risk_gap"
+            ]
+          },
+          "cause": {
+            "type": "string",
+            "enum": [
+              "spec_gap",
+              "spec_conflict",
+              "implementation_defect",
+              "allowed_variation",
+              "environment_difference",
+              "insufficient_evidence"
+            ]
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "high",
+              "medium",
+              "low"
+            ]
+          },
+          "confidence": {
+            "type": "string",
+            "enum": [
+              "high",
+              "medium",
+              "low"
+            ]
+          },
+          "rationale": {
+            "type": "string",
+            "minLength": 1
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "rework",
+              "decision",
+              "fix_implementation",
+              "none",
+              "investigate"
+            ]
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "code",
+                    "test",
+                    "requirement",
+                    "artifact",
+                    "search",
+                    "manifest"
+                  ]
+                },
+                "ref": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "scope": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "kind",
+                "ref",
+                "scope"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 1
+          },
+          "patches": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "alternative_id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "target": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "operation": {
+                  "type": "string",
+                  "enum": [
+                    "create",
+                    "replace",
+                    "delete"
+                  ]
+                },
+                "preimage": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "old_text": {
+                  "type": "string"
+                },
+                "new_text": {
+                  "type": "string"
+                },
+                "application": {
+                  "type": "string",
+                  "enum": [
+                    "passed",
+                    "failed",
+                    "unknown",
+                    "not_run"
+                  ]
+                },
+                "structure": {
+                  "type": "string",
+                  "enum": [
+                    "passed",
+                    "failed",
+                    "unknown",
+                    "not_run"
+                  ]
+                },
+                "consistency": {
+                  "type": "string",
+                  "enum": [
+                    "passed",
+                    "failed",
+                    "unknown",
+                    "not_run"
+                  ]
+                },
+                "decision": {
+                  "type": "string",
+                  "enum": [
+                    "pending",
+                    "accepted",
+                    "rejected"
+                  ]
+                }
+              },
+              "required": [
+                "alternative_id",
+                "target",
+                "operation",
+                "preimage",
+                "old_text",
+                "new_text",
+                "application",
+                "structure",
+                "consistency",
+                "decision"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "missing_input": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "source": {
+                    "type": "string",
+                    "enum": [
+                      "jira",
+                      "config_context",
+                      "config_rules",
+                      "project_specs",
+                      "gigacode_rules",
+                      "decision",
+                      "generation",
+                      "unknown"
+                    ]
+                  },
+                  "stage": {
+                    "type": "string",
+                    "enum": [
+                      "propose",
+                      "apply",
+                      "unknown"
+                    ]
+                  },
+                  "confidence": {
+                    "type": "string",
+                    "enum": [
+                      "high",
+                      "medium",
+                      "low"
+                    ]
+                  },
+                  "evidence": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "kind": {
+                          "type": "string",
+                          "enum": [
+                            "code",
+                            "test",
+                            "requirement",
+                            "artifact",
+                            "search",
+                            "manifest"
+                          ]
+                        },
+                        "ref": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "scope": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "ref",
+                        "scope"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "hypothesis": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "suggested_text": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "source",
+                  "stage",
+                  "confidence",
+                  "evidence",
+                  "hypothesis",
+                  "suggested_text"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "observation",
+          "cause",
+          "severity",
+          "confidence",
+          "rationale",
+          "action",
+          "evidence",
+          "patches",
+          "missing_input"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "summary": {
+      "type": "object"
+    },
+    "verdict": {
+      "type": "string",
+      "enum": [
+        "inconclusive",
+        "needs_rework",
+        "needs_decisions",
+        "spec_ready"
+      ]
+    }
+  },
+  "required": [
+    "schema_version",
+    "run_id",
+    "scope",
+    "manifest_ref",
+    "isolation",
+    "checks",
+    "limitations",
+    "details",
+    "findings"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:openspec-spec-probe:report:2.0",
+  "title": "Spec probe report v2"
+}

@@ -1,0 +1,63 @@
+{
+  "schema_version": "6.0",
+  "run_id": "example",
+  "change_name": "otp-expiration",
+  "scope": "Синтетический пример: сервис auth, истечение OTP. Ссылки иллюстративные; реальный код не проверялся.",
+  "checks": {
+    "inputs": {
+      "status": "passed",
+      "reason": "Пример заполнения, не результат реального запуска",
+      "finding_ids": []
+    },
+    "observations": {
+      "status": "passed",
+      "reason": "Пример заполнения, не результат реального запуска",
+      "finding_ids": []
+    },
+    "requirements": {
+      "status": "passed",
+      "reason": "Пример заполнения, не результат реального запуска",
+      "finding_ids": []
+    },
+    "comparison": {
+      "status": "passed",
+      "reason": "Пример заполнения, не результат реального запуска",
+      "finding_ids": [
+        "F-01"
+      ]
+    },
+    "freshness": {
+      "status": "passed",
+      "reason": "Пример заполнения, не результат реального запуска",
+      "finding_ids": []
+    }
+  },
+  "tests": {
+    "status": "not_run",
+    "reason": "Учебный пример без запуска тестов"
+  },
+  "limitations": [],
+  "questions": [],
+  "findings": [
+    {
+      "id": "F-01",
+      "summary": "Истёкший OTP принимается при подтверждении",
+      "severity": "high",
+      "cause": "implementation_defect",
+      "problem": "Код можно использовать после истечения срока действия, что нарушает требование ограничения времени подтверждения.",
+      "code": "auth/verify.py:42 (условный снимок example): обработчик сравнивает значение кода, но не проверяет expires_at.",
+      "original_change": "specs/auth/spec.md, сценарий «Истёкший код»: после expires_at подтверждение должно отклоняться.",
+      "evidence": [
+        "Иллюстративное сопоставление сценария и обработчика; не реальная находка."
+      ],
+      "observation_ids": [
+        "OBS-01"
+      ],
+      "decision": {
+        "kind": "keep",
+        "basis": "Сценарий однозначно требует отклонять истёкший OTP."
+      }
+    }
+  ],
+  "verdict": "needs_attention"
+}

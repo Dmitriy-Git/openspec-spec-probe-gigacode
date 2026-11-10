@@ -1,0 +1,22 @@
+{
+  "source": "openspec-spec-probe-gigacode",
+  "variant": "8.3-fast.1",
+  "sha256": {
+    ".DS_Store": "04394f136b93c56f4ae05e103f3c6181a5f1fedbdc7c651fdb6b3cae03b2f0d8",
+    "INSTALL.md": "4f96f2718f9ee7a91f00e679366ffc61abff0dfe36f1df79bbc4c8ad25f0af10",
+    "evaluation.md": "64f994e4a5b79cb8c45331a0a6ddafe68931407bcff70142bb17d93a401ea94d",
+    "agents/openspec-spec-probe.md": "69542709c16b3b1219fcec10ff3c85d01569fdd3ffc3622e606760ca62be2536",
+    "agents/.DS_Store": "207a19421f20d1acc930954bd19b6ba30d9cb61da6582514cdb54b1e94ef16ac",
+    "examples/review-details.md": "4f83cf6a62e52f947c583193c69fef2bc31042d144d7e83cdf998f9bbfd9d558",
+    "examples/report.json": "ea309608a1659027a5aa7114f64d52d5a020ee9b93804fb5f606a88adec6afb6",
+    "examples/report.md": "2f97ba1beda65eb74bef8a66b9dbd8a7eaca2a9b69df9fe21ed424f54b5d3c39",
+    "examples/observations.md": "b2b4b45c58c9428aae0df4ae97204b134988ce721022ba35a30d711bbf45244b",
+    "agents/openspec-spec-probe/report.schema.json": "6779d488721eb9cd2d404bcabc54ba5c3968450b95a2b93b99c92c8582bd1437",
+    "agents/openspec-spec-probe/.DS_Store": "5a91329b7f76b40ac5fa78f1b8cbc864030dfaf83f506cb43971ef37cdcc939a",
+    "agents/openspec-spec-probe/scripts/runner.py": "465a38cf6704095f2a3935206760a20b38bb0d06bb7357df6c191648472787ff",
+    "agents/openspec-spec-probe/scripts/.DS_Store": "500749a058673f5c13b6cd73c1ec341171f5ddd6a7b1eca7a0e5dd909aa3c2b9",
+    "agents/openspec-spec-probe/scripts/report.py": "832ff7a1cd82e8697ad7822de30ffe7fe163d23545a90a996a34bb03be06a473",
+    "agents/openspec-spec-probe/scripts/__pycache__/report.cpython-313.pyc": "b12c96a8038ef38b8710fd3d3dd415d0e05a0ca96421404fae3aa551d813095e",
+    "agents/openspec-spec-probe/scripts/__pycache__/runner.cpython-313.pyc": "4548ea3478d22f424bd313de7b7fc686ee525c485365b2d34ccfceb9dc8d85de"
+  }
+}
